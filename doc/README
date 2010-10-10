@@ -1,6 +1,9 @@
 Popup notofications over DBus Vacuum-IM extension plugin
 --------------------------------------------------------
 
+Плагин использует org.freedesktop.Notifications для показа уведомлений
+Зависит от QDBus
+
 Web Site:
   http://http://code.google.com/p/vacuum-plugins/
 
