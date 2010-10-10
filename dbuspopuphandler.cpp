@@ -15,10 +15,12 @@ DbusPopupHandler::~DbusPopupHandler()
 void DbusPopupHandler::pluginInfo(IPluginInfo *APluginInfo)
 {
         APluginInfo->name = tr("Dbus Popup Notifications Handler");
-        APluginInfo->description = tr("Allows other modules use nice Kinetic popup");
+        APluginInfo->description = tr("Allows other modules use DBus to show notifications");
         APluginInfo->version = "1.0";
         APluginInfo->author = "Crying Angel";
         APluginInfo->homePage = "http://www.vacuum-im.org";
+        APluginInfo->dependences.append(NOTIFICATIONS_UUID);
+        APluginInfo->dependences.append(AVATARTS_UUID);
 }
 
 bool DbusPopupHandler::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -52,7 +54,7 @@ bool DbusPopupHandler::initObjects()
         qDebug() << "DBus Notifys: DBus interface created successfully.";
 
 //        connect(FNotify,SIGNAL(NotificationClosed(uint,uint)),this,SLOT(onNotifyClosed(uint,uint)));
-        connect(FNotify,SIGNAL(ActionInvoked(uint,QString)),this,SLOT(onWindowNotifyActivated(uint,QString)));
+        connect(FNotify,SIGNAL(ActionInvoked(uint,QString)),this,SLOT(onActionInvoked(uint,QString)));
 
         FNotifications->insertNotificationHandler(NHO_DBUSPOPUP, this);
 
@@ -82,14 +84,16 @@ bool DbusPopupHandler::showNotification(int AOrder, uchar AKind, int ANotifyId, 
 
     QList<QVariant> notifyArgs;
     notifyArgs.append("Vacuum IM");                                             //app-name
-    notifyArgs.append((uint)ANotifyId);                                               //id;
+    notifyArgs.append((uint)ANotifyId);                                         //id;
     if(!FUseFreedesktopSpec)
         notifyArgs.append("");                                                  //event-id
     notifyArgs.append(iconPath);                                                //app-icon(path to icon on disk)
     notifyArgs.append(ANotification.data.value(NDR_POPUP_CAPTION).toString());  //summary (notification title)
     if(FUseFreedesktopSpec)
         notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+ANotification.data.value(NDR_POPUP_TEXT).toString());   //body
-    QStringList acts = (QStringList() << "actOne" << "Show");
+    QStringList acts;
+    acts  << "actOne" << tr("Show");
+    acts  << "actTwo" << tr("Ignore");
     notifyArgs.append(acts);                                                    //actions
     QVariantMap hints;
     if (!imgPath.isEmpty())
@@ -115,10 +119,13 @@ bool DbusPopupHandler::showNotification(int AOrder, uchar AKind, int ANotifyId, 
     return true;
 }
 
-void DbusPopupHandler::onWindowNotifyActivated(unsigned int notifyId, QString action)
+void DbusPopupHandler::onActionInvoked(unsigned int notifyId, QString action)
 {
         qDebug() << "DBus Notifys: action "<<action<<" invoked";
-        FNotifications->activateNotification(notifyId);
+        if (action=="actOne")
+            FNotifications->activateNotification(notifyId);
+        else
+            FNotifications->removeNotification(notifyId);
 }
 
 void DbusPopupHandler::onWindowNotifyRemoved(/*int ANotifyId*/)

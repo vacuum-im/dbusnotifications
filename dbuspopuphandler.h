@@ -51,7 +51,7 @@ public:
         virtual bool showNotification(int AOrder, uchar AKind, int ANotifyId, const INotification &ANotification);
 
 protected slots:
-        void onWindowNotifyActivated(unsigned int notifyId, QString action);
+        void onActionInvoked(unsigned int notifyId, QString action);
         void onWindowNotifyRemoved(/*int ANotifyId*/);
 
 private:
