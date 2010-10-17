@@ -35,6 +35,7 @@ bool DbusPopupHandler::initConnections(IPluginManager *APluginManager, int &/*AI
         if (!plugin) return false;
                 FNotifications = qobject_cast<INotifications *>(plugin->instance());
 
+        connect (APluginManager->instance(), SIGNAL(aboutToQuit()), this, SLOT(onApplicationQuit()));
 //        connect (FNotifications->instance(), SIGNAL(notificationRemoved(int)),this,SLOT(onWindowNotifyRemoved(int)));
 
         return true;
@@ -70,7 +71,9 @@ bool DbusPopupHandler::initSettings()
 
 bool DbusPopupHandler::showNotification(int AOrder, uchar AKind, int ANotifyId, const INotification &ANotification)
 {
+    qDebug() << "DBus Notifys: showNotification requested.";
     if (AOrder!=NHO_DBUSPOPUP||!(AKind&INotification::PopupWindow)) return false;
+    qDebug() << "DBus Notifys: showNotification request accepted.";
 
     Jid contactJid = ANotification.data.value(NDR_CONTACT_JID).toString();
     QString toolTip = ANotification.data.value(NDR_TOOLTIP).toString();
@@ -131,6 +134,11 @@ void DbusPopupHandler::onActionInvoked(unsigned int notifyId, QString action)
 void DbusPopupHandler::onWindowNotifyRemoved(/*int ANotifyId*/)
 {
 
+}
+
+void DbusPopupHandler::onApplicationQuit()
+{
+    FNotifications->removeNotificationHandler(NHO_DBUSPOPUP, this);
 }
 
 //void DbusPopupHandler::onWindowNotifyDestroyed()

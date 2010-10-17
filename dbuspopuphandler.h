@@ -53,6 +53,7 @@ public:
 protected slots:
         void onActionInvoked(unsigned int notifyId, QString action);
         void onWindowNotifyRemoved(/*int ANotifyId*/);
+        void onApplicationQuit ();
 
 private:
         IAvatars *FAvatars;
