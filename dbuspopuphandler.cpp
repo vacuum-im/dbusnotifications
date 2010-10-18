@@ -16,7 +16,7 @@ void DbusPopupHandler::pluginInfo(IPluginInfo *APluginInfo)
 {
         APluginInfo->name = tr("Dbus Popup Notifications Handler");
         APluginInfo->description = tr("Allows other modules use DBus to show notifications");
-        APluginInfo->version = "1.0";
+        APluginInfo->version = "1.0."SVN_REVISION;
         APluginInfo->author = "Crying Angel";
         APluginInfo->homePage = "http://www.vacuum-im.org";
         APluginInfo->dependences.append(NOTIFICATIONS_UUID);
@@ -129,6 +129,8 @@ void DbusPopupHandler::onActionInvoked(unsigned int notifyId, QString action)
             FNotifications->activateNotification(notifyId);
         else
             FNotifications->removeNotification(notifyId);
+
+        FNotify->call("CloseNotification",notifyId);
 }
 
 void DbusPopupHandler::onWindowNotifyRemoved(/*int ANotifyId*/)
