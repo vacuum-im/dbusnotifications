@@ -62,6 +62,8 @@ resources.files    = ./resources/*
 documents.path     = $$INSTALL_DOCUMENTS
 documents.files    = ./doc/*
 translations.path  = $$INSTALL_TRANSLATIONS
-translations.files = ./translations/*
+translations.files = ./translations/bin/*
+
+INSTALLS            = target documents translations
 
 include(dbusnotifications.pri)
