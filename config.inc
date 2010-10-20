@@ -43,14 +43,16 @@ isEmpty(VACUUM_BUILD_PATH) {
 }
 
 #Debug Features
-CONFIG(debug, debug|release) 
-{
-  #Path to copy plugin on build
-  win32:DLLDESTDIR       = $${VACUUM_BUILD_PATH}/plugins
-  unix:DESTDIR           = $${VACUUM_BUILD_PATH}/plugins
+!isEmpty(VACUUM_BUILD_PATH) {
+    CONFIG(debug, debug|release)
+    {
+      #Path to copy plugin on build
+      win32:DLLDESTDIR       = $${VACUUM_BUILD_PATH}/plugins
+      unix:DESTDIR           = $${VACUUM_BUILD_PATH}/plugins
 
-  #Path from vacumm to plugin resources
-  #DEFINES               += RESOURCES_DIR='\\\"../trivialplugin/resources\\\"'
+      #Path from vacumm to plugin resources
+      #DEFINES               += RESOURCES_DIR='\\\"../trivialplugin/resources\\\"'
+    }
 }
 
 #Should be included from SDK
