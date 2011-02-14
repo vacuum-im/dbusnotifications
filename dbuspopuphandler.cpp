@@ -93,7 +93,7 @@ bool DbusPopupHandler::showNotification(int AOrder, uchar AKind, int ANotifyId, 
     notifyArgs.append(iconPath);                                                //app-icon(path to icon on disk)
     notifyArgs.append(ANotification.data.value(NDR_POPUP_CAPTION).toString());  //summary (notification title)
     if(FUseFreedesktopSpec)
-        notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+ANotification.data.value(NDR_POPUP_TEXT).toString());   //body
+        notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+ANotification.data.value(NDR_POPUP_HTML).toString());   //body
     QStringList acts;
     acts  << "actOne" << tr("Show");
     acts  << "actTwo" << tr("Ignore");

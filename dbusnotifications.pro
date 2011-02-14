@@ -9,7 +9,7 @@ isEmpty(VACUUM_BUILD_PATH) {
     LIBS               += -L$$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_LIB_DIR
     LIBS               += -l$${TARGET_UTILS}
 } else {
-    LIBS               += -L$${VACUUM_BUILD_PATH}/src/libs
+    LIBS               += -L$${VACUUM_BUILD_PATH}
     LIBS               += -l$${TARGET_UTILS}
 }
 isEmpty(VACUUM_SOURCE_PATH) {
