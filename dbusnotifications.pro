@@ -6,7 +6,8 @@ TEMPLATE            = lib
 CONFIG             += plugin
 QT                  = core dbus gui
 isEmpty(VACUUM_BUILD_PATH) {
-    LIBS               += -L$$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_LIB_DIR
+#    LIBS               += -L$$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_LIB_DIR
+    LIBS               += -L$$INSTALL_PREFIX/$$INSTALL_LIB_DIR
     LIBS               += -l$${TARGET_UTILS}
 } else {
     LIBS               += -L$${VACUUM_BUILD_PATH}

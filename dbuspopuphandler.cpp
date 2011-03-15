@@ -54,6 +54,23 @@ bool DbusPopupHandler::initObjects()
         FUseFreedesktopSpec = true;
         qDebug() << "DBus Notifys: DBus interface created successfully.";
 
+        QDBusMessage reply = FNotify->call(QDBus::Block,"GetServerInformation");
+        if(reply.type() == QDBusMessage::ErrorMessage)
+        {
+            qWarning() << "DBus Error: " << reply.errorMessage();
+        }
+        else
+        {
+            for (int i=0;i<reply.arguments().count();i++)
+            {
+                qDebug() << reply.arguments().at(i).toString();
+            };
+            if (reply.arguments().at(1) == "GNOME")
+            {
+                FGnomeDaemon = true;
+            };
+        };
+
 //        connect(FNotify,SIGNAL(NotificationClosed(uint,uint)),this,SLOT(onNotifyClosed(uint,uint)));
         connect(FNotify,SIGNAL(ActionInvoked(uint,QString)),this,SLOT(onActionInvoked(uint,QString)));
 
@@ -76,9 +93,18 @@ bool DbusPopupHandler::showNotification(int AOrder, uchar AKind, int ANotifyId, 
     qDebug() << "DBus Notifys: showNotification request accepted.";
 
     Jid contactJid = ANotification.data.value(NDR_CONTACT_JID).toString();
-    QString toolTip = ANotification.data.value(NDR_TOOLTIP).toString();
+    QString toolTip = ANotification.data.value(NDR_POPUP_HTML).toString();
     QString imgPath;
     QString iconPath;
+
+    qDebug() << "NDR_TOOLTIP" << ANotification.data.value(NDR_TOOLTIP).toString();
+    qDebug() << "NDR_POPUP_CAPTION" << ANotification.data.value(NDR_POPUP_CAPTION).toString();
+    qDebug() << "NDR_POPUP_TITLE" << ANotification.data.value(NDR_POPUP_TITLE).toString();
+    qDebug() << "NDR_POPUP_HTML" << ANotification.data.value(NDR_POPUP_HTML).toString();
+    toolTip = toolTip.replace("<br />", "\n");
+    qDebug() << "NDR_POPUP_HTML trimed 1" << toolTip;
+    toolTip = toolTip.replace(QRegExp("<[^>]*>"), "");
+    qDebug() << "NDR_POPUP_HTML trimed 2" << toolTip;
 
     if (FAvatars)
     {
@@ -88,12 +114,20 @@ bool DbusPopupHandler::showNotification(int AOrder, uchar AKind, int ANotifyId, 
     QList<QVariant> notifyArgs;
     notifyArgs.append("Vacuum IM");                                             //app-name
     notifyArgs.append((uint)ANotifyId);                                         //id;
-    if(!FUseFreedesktopSpec)
-        notifyArgs.append("");                                                  //event-id
+//    if(!FUseFreedesktopSpec)
+//        notifyArgs.append("");                                                  //event-id
     notifyArgs.append(iconPath);                                                //app-icon(path to icon on disk)
     notifyArgs.append(ANotification.data.value(NDR_POPUP_CAPTION).toString());  //summary (notification title)
-    if(FUseFreedesktopSpec)
-        notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+ANotification.data.value(NDR_POPUP_HTML).toString());   //body
+//    if(FUseFreedesktopSpec)
+    if (FGnomeDaemon)
+    {
+        notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+toolTip/*ANotification.data.value(NDR_POPUP_HTML).toString()*/);
+    }
+    else
+    {
+        notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+ANotification.data.value(NDR_POPUP_HTML).toString());
+    }
+   //body
     QStringList acts;
     acts  << "actOne" << tr("Show");
     acts  << "actTwo" << tr("Ignore");

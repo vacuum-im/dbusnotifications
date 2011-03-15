@@ -69,6 +69,7 @@ private:
         int FTimeout;
         bool FUpdateNotify;
         bool FUseFreedesktopSpec;
+        bool FGnomeDaemon;
 };
 
 #endif // DBUSPOPUPHANDLER_H
