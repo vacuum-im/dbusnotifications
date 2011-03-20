@@ -4,7 +4,7 @@ include(config.inc)
 TARGET              = dbusnotifications
 TEMPLATE            = lib
 CONFIG             += plugin
-QT                  = core dbus gui
+QT                  = core dbus gui xml
 isEmpty(VACUUM_BUILD_PATH) {
 #    LIBS               += -L$$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_LIB_DIR
     LIBS               += -L$$INSTALL_PREFIX/$$INSTALL_LIB_DIR

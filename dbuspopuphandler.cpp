@@ -97,6 +97,8 @@ bool DbusPopupHandler::showNotification(int AOrder, uchar AKind, int ANotifyId, 
     QString imgPath;
     QString iconPath;
 
+    FTimeout = Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt()*1000;
+
     qDebug() << "NDR_TOOLTIP" << ANotification.data.value(NDR_TOOLTIP).toString();
     qDebug() << "NDR_POPUP_CAPTION" << ANotification.data.value(NDR_POPUP_CAPTION).toString();
     qDebug() << "NDR_POPUP_TITLE" << ANotification.data.value(NDR_POPUP_TITLE).toString();

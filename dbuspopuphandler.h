@@ -25,6 +25,8 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/iavatars.h>
+#include <definitions/optionvalues.h>
+#include <utils/options.h>
 
 #ifdef SVNINFO
 #  include "svninfo.h"
