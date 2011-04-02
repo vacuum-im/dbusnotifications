@@ -52,6 +52,7 @@ bool DbusPopupHandler::initObjects()
                return false;
         }
         FUseFreedesktopSpec = true;
+        FRemoveTags = false;
         qDebug() << "DBus Notifys: DBus interface created successfully.";
 
         QDBusMessage reply = FNotify->call(QDBus::Block,"GetServerInformation");
@@ -67,7 +68,11 @@ bool DbusPopupHandler::initObjects()
             };
             if (reply.arguments().at(1) == "GNOME")
             {
-                FGnomeDaemon = true;
+                FRemoveTags = true;
+            }
+            else if (reply.arguments().at(0) == "naughty")
+            {
+                FRemoveTags = true;
             };
         };
 
@@ -121,7 +126,7 @@ bool DbusPopupHandler::showNotification(int AOrder, uchar AKind, int ANotifyId, 
     notifyArgs.append(iconPath);                                                //app-icon(path to icon on disk)
     notifyArgs.append(ANotification.data.value(NDR_POPUP_CAPTION).toString());  //summary (notification title)
 //    if(FUseFreedesktopSpec)
-    if (FGnomeDaemon)
+    if (FRemoveTags)
     {
         notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+toolTip/*ANotification.data.value(NDR_POPUP_HTML).toString()*/);
     }
