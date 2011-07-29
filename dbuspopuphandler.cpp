@@ -91,7 +91,7 @@ bool DbusPopupHandler::initSettings()
         return true;
 }
 
-bool DbusPopupHandler::showNotification(int AOrder, uchar AKind, int ANotifyId, const INotification &ANotification)
+bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification)
 {
     qDebug() << "DBus Notifys: showNotification requested.";
     if (AOrder!=NHO_DBUSPOPUP||!(AKind&INotification::PopupWindow)) return false;

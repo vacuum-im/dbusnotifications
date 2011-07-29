@@ -56,7 +56,7 @@ public:
         virtual bool initSettings();
         virtual bool startPlugin() { return true; }
         //INotificationHandler
-        virtual bool showNotification(int AOrder, uchar AKind, int ANotifyId, const INotification &ANotification);
+        virtual bool showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification);
 
 protected slots:
         void onActionInvoked(unsigned int notifyId, QString action);
