@@ -72,6 +72,7 @@ private:
         bool FUpdateNotify;
         bool FUseFreedesktopSpec;
         bool FRemoveTags;
+        bool FAllowActions;
 };
 
 #endif // DBUSPOPUPHANDLER_H
