@@ -53,6 +53,7 @@ bool DbusPopupHandler::initObjects()
         }
         FUseFreedesktopSpec = true;
         FRemoveTags = false;
+        FAllowActions = true;
         qDebug() << "DBus Notifys: DBus interface created successfully.";
 
         QDBusMessage reply = FNotify->call(QDBus::Block,"GetServerInformation");
@@ -73,6 +74,10 @@ bool DbusPopupHandler::initObjects()
             else if (reply.arguments().at(0) == "naughty")
             {
                 FRemoveTags = true;
+            };
+            if (reply.arguments().at(0) == "notify-osd")
+            {
+                FAllowActions = false;
             };
         };
 
@@ -136,8 +141,11 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
     }
    //body
     QStringList acts;
-    acts  << "actOne" << tr("Show");
-    acts  << "actTwo" << tr("Ignore");
+    if (FAllowActions)
+    {
+        acts  << "actOne" << tr("Show");
+        acts  << "actTwo" << tr("Ignore");
+    }
     notifyArgs.append(acts);                                                    //actions
     QVariantMap hints;
     if (!imgPath.isEmpty())
