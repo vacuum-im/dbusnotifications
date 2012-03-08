@@ -18,21 +18,11 @@
 #ifndef DBUSPOPUPHANDLER_H
 #define DBUSPOPUPHANDLER_H
 
-#include <QDebug>
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusReply>
-#include <definitions/notificationdataroles.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/iavatars.h>
-#include <definitions/optionvalues.h>
-#include <utils/options.h>
-
-#ifdef SVNINFO
-#  include "svninfo.h"
-#else
-#  define SVN_REVISION              "0"
-#endif
 
 #define DBUSPOPUPHANDLER_UUID  "{63685fbc-5a2d-4e8c-b9d5-d69ea8fbdb4e}"
 #define NHO_DBUSPOPUP              3000
