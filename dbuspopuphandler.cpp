@@ -56,7 +56,9 @@ bool DbusPopupHandler::initObjects()
                                  QDBusConnection::sessionBus()/*, this*/);
     if(FNotify->lastError().type() != QDBusError::NoError)
     {
+#ifndef QT_NO_DEBUG
         qWarning() << "DBus Notifys: Unable to create interface.";
+#endif
         return false;
     }
     FUseFreedesktopSpec = true;
@@ -67,11 +69,7 @@ bool DbusPopupHandler::initObjects()
 #endif
 
     QDBusMessage reply = FNotify->call(QDBus::Block,"GetServerInformation");
-    if(reply.type() == QDBusMessage::ErrorMessage)
-    {
-        qWarning() << "DBus Error: " << reply.errorMessage();
-    }
-    else
+    if(QDBusMessage::ErrorMessage != reply.type())
     {
 #ifndef NO_QT_DEBUG
         for (int i=0;i<reply.arguments().count();i++)
@@ -86,12 +84,19 @@ bool DbusPopupHandler::initObjects()
         else if (reply.arguments().at(0) == "naughty")
         {
             FRemoveTags = true;
-        };
+        }
+
         if (reply.arguments().at(0) == "notify-osd")
         {
             FAllowActions = false;
-        };
-    };
+        }
+    }
+#ifndef QT_NO_DEBUG
+    else
+    {
+        qWarning() << "DBus Error: " << reply.errorMessage();
+    }
+#endif
 
     //        connect(FNotify,SIGNAL(NotificationClosed(uint,uint)),this,SLOT(onNotifyClosed(uint,uint)));
     connect(FNotify,SIGNAL(ActionInvoked(uint,QString)),this,SLOT(onActionInvoked(uint,QString)));
@@ -191,11 +196,12 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
             ANotifyId = reply.value();
         }
     }
+#ifndef QT_NO_DEBUG
     else
     {
         qWarning() << "DBus Notifys Error: " << reply.error();
-    };
-
+    }
+#endif
     return true;
 }
 
