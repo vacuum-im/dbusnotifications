@@ -12,6 +12,7 @@ DbusPopupHandler::DbusPopupHandler()
 {
     FAvatars = NULL;
     FNotifications = NULL;
+    FOptionsManager = NULL;
     FNotify = NULL;
 }
 
@@ -29,6 +30,7 @@ void DbusPopupHandler::pluginInfo(IPluginInfo *APluginInfo)
     APluginInfo->homePage = "http://www.vacuum-im.org";
     APluginInfo->dependences.append(NOTIFICATIONS_UUID);
     APluginInfo->dependences.append(AVATARTS_UUID);
+    APluginInfo->dependences.append(OPTIONSMANAGER_UUID);
 }
 
 bool DbusPopupHandler::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -43,10 +45,44 @@ bool DbusPopupHandler::initConnections(IPluginManager *APluginManager, int &/*AI
     if (!plugin) return false;
     FNotifications = qobject_cast<INotifications *>(plugin->instance());
 
+    plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
+    if (!plugin) return false;
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+
+    connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+    connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
+
     connect (APluginManager->instance(), SIGNAL(aboutToQuit()), this, SLOT(onApplicationQuit()));
     //        connect (FNotifications->instance(), SIGNAL(notificationRemoved(int)),this,SLOT(onWindowNotifyRemoved(int)));
 
     return true;
+}
+
+QMultiMap<int, IOptionsWidget *> DbusPopupHandler::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+{
+    QMultiMap<int, IOptionsWidget *> widgets;
+    if (FOptionsManager && ANodeId==OPN_DBUSPOPUP)
+    {
+        widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->optionsHeaderWidget(FServerName+" "+FServerVendor+" "+FServerVersion,AParent));
+        widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->optionsNodeWidget(Options::node(OPV_DP_ALLOW_ACTIONS),tr("Allow actions in notifications"),AParent));
+        widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->optionsNodeWidget(Options::node(OPV_DP_REMOVE_TAGS),tr("Remove html tags"),AParent));
+    }
+    return widgets;
+}
+
+void DbusPopupHandler::onOptionsOpened()
+{
+    Options::node(OPV_DP_ALLOW_ACTIONS).setValue(FAllowActions);
+    Options::node(OPV_DP_REMOVE_TAGS).setValue(FRemoveTags);
+}
+
+void DbusPopupHandler::onOptionsChanged(const OptionsNode &ANode)
+{
+    if (ANode.path() == OPV_DP_ALLOW_ACTIONS) {
+        FAllowActions = Options::node(OPV_DP_ALLOW_ACTIONS).value().toBool();
+    } else if (ANode.path() == OPV_DP_REMOVE_TAGS) {
+        FRemoveTags = Options::node(OPV_DP_REMOVE_TAGS).value().toBool();
+    }
 }
 
 bool DbusPopupHandler::initObjects()
@@ -77,16 +113,20 @@ bool DbusPopupHandler::initObjects()
             qDebug() << reply.arguments().at(i).toString();
         };
 #endif
-        if (reply.arguments().at(1) == "GNOME")
+        FServerName = reply.arguments().at(0).toString();
+        FServerVendor = reply.arguments().at(1).toString();
+        FServerVersion = reply.arguments().at(2).toString();
+
+        if (FServerVendor == "GNOME")
         {
             FRemoveTags = true;
         }
-        else if (reply.arguments().at(0) == "naughty")
+        else if (FServerName == "naughty")
         {
             FRemoveTags = true;
         }
 
-        if (reply.arguments().at(0) == "notify-osd")
+        if (FServerName == "notify-osd")
         {
             FAllowActions = false;
         }
@@ -110,15 +150,18 @@ bool DbusPopupHandler::initSettings()
 {
     FTimeout = 6000;
     FUpdateNotify = false;
+
+    if (FOptionsManager)
+    {
+        IOptionsDialogNode dnode = { ONO_DBUSPOPUP, OPN_DBUSPOPUP, tr("DBus Popup"), MNI_DBUSPOPUP };
+        FOptionsManager->insertOptionsDialogNode(dnode);
+        FOptionsManager->insertOptionsHolder(this);
+    }
     return true;
 }
 
 bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification)
 {
-#ifndef NO_QT_DEBUG
-    qDebug() << "DBus Notifys: showNotification requested.";
-#endif
-
     if (AOrder!=NHO_DBUSPOPUP||!(AKind&INotification::PopupWindow)) return false;
 
 #ifndef NO_QT_DEBUG
@@ -126,7 +169,7 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 #endif
 
     Jid contactJid = ANotification.data.value(NDR_CONTACT_JID).toString();
-    QString toolTip = ANotification.data.value(NDR_POPUP_HTML).toString();
+    QString popupBody = ANotification.data.value(NDR_POPUP_HTML).toString();
     QString imgPath;
     QString iconPath;
 
@@ -139,16 +182,16 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
     qDebug() << "NDR_POPUP_HTML" << ANotification.data.value(NDR_POPUP_HTML).toString();
 #endif
 
-    toolTip = toolTip.replace("<br />", "\n");
+    popupBody = popupBody.replace("<br />", "\n");
 
 #ifndef NO_QT_DEBUG
-    qDebug() << "NDR_POPUP_HTML trimed 1" << toolTip;
+    qDebug() << "NDR_POPUP_HTML trimed 1" << popupBody;
 #endif
 
-    toolTip = toolTip.replace(QRegExp("<[^>]*>"), "");
+    popupBody = popupBody.replace(QRegExp("<[^>]*>"), "");
 
 #ifndef NO_QT_DEBUG
-    qDebug() << "NDR_POPUP_HTML trimed 2" << toolTip;
+    qDebug() << "NDR_POPUP_HTML trimed 2" << popupBody;
 #endif
 
     if (FAvatars)
@@ -162,15 +205,15 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
     //    if(!FUseFreedesktopSpec)
     //        notifyArgs.append("");                                                  //event-id
     notifyArgs.append(iconPath);                                                //app-icon(path to icon on disk)
-    notifyArgs.append(ANotification.data.value(NDR_POPUP_CAPTION).toString());  //summary (notification title)
+    notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString());  //summary (notification title)
     //    if(FUseFreedesktopSpec)
     if (FRemoveTags)
     {
-        notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+toolTip/*ANotification.data.value(NDR_POPUP_HTML).toString()*/);
+        notifyArgs.append(/*ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+*/popupBody/*ANotification.data.value(NDR_POPUP_HTML).toString()*/);
     }
     else
     {
-        notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+ANotification.data.value(NDR_POPUP_HTML).toString());
+        notifyArgs.append(/*ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+*/ANotification.data.value(NDR_POPUP_HTML).toString());
     }
     //body
     QStringList acts;

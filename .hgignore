@@ -1,0 +1,5 @@
+syntax: glob
+
+usertune.pro*
+CMakeLists.txt.user
+build

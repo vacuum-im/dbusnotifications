@@ -22,18 +22,36 @@
 #include <QtDBus/QDBusReply>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/inotifications.h>
+#include <interfaces/ioptionsmanager.h>
 #include <interfaces/iavatars.h>
 
 #define DBUSPOPUPHANDLER_UUID  "{63685fbc-5a2d-4e8c-b9d5-d69ea8fbdb4e}"
-#define NHO_DBUSPOPUP              3000
+#define NHO_DBUSPOPUP               3000
+
+//Menu Icons
+#define MNI_DBUSPOPUP               "dbuspopup"
+
+//Option Nodes
+#define OPN_DBUSPOPUP               "DBus popups"
+
+//Option Node Order
+#define ONO_DBUSPOPUP               900
+
+//Option Widget Order
+#define OWO_DBUSPOPUP               500
+
+//Options
+#define OPV_DP_ALLOW_ACTIONS        "dbuspopup.allow-actions"
+#define OPV_DP_REMOVE_TAGS          "dbuspopup.remove-tags"
 
 class DbusPopupHandler :
                         public QObject,
                         public IPlugin,
-                        public INotificationHandler
+                        public INotificationHandler,
+                        public IOptionsHolder
 {
         Q_OBJECT;
-        Q_INTERFACES(IPlugin INotificationHandler);
+        Q_INTERFACES(IPlugin INotificationHandler IOptionsHolder);
 public:
         DbusPopupHandler();
         ~DbusPopupHandler();
@@ -45,10 +63,14 @@ public:
         virtual bool initObjects();
         virtual bool initSettings();
         virtual bool startPlugin() { return true; }
+        //IOptionsHolder
+        virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
         //INotificationHandler
         virtual bool showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification);
 
 protected slots:
+        void onOptionsOpened();
+        void onOptionsChanged(const OptionsNode &ANode);
         void onActionInvoked(unsigned int notifyId, QString action);
         void onWindowNotifyRemoved(/*int ANotifyId*/);
         void onApplicationQuit ();
@@ -56,7 +78,12 @@ protected slots:
 private:
         IAvatars *FAvatars;
         INotifications *FNotifications;
+        IOptionsManager *FOptionsManager;
         QDBusInterface *FNotify;
+
+        QString FServerName;
+        QString FServerVendor;
+        QString FServerVersion;
 
         int FTimeout;
         bool FUpdateNotify;
