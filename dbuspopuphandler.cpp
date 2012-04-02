@@ -63,7 +63,7 @@ QMultiMap<int, IOptionsWidget *> DbusPopupHandler::optionsWidgets(const QString 
     QMultiMap<int, IOptionsWidget *> widgets;
     if (FOptionsManager && ANodeId==OPN_DBUSPOPUP)
     {
-        widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->optionsHeaderWidget(FServerName+" "+FServerVendor+" "+FServerVersion,AParent));
+        widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->optionsHeaderWidget(tr("Notifications provider: %1").arg(FServerName+" "+FServerVendor+" "+FServerVersion),AParent));
         widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->optionsNodeWidget(Options::node(OPV_DP_ALLOW_ACTIONS),tr("Allow actions in notifications"),AParent));
         widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->optionsNodeWidget(Options::node(OPV_DP_REMOVE_TAGS),tr("Remove html tags"),AParent));
     }
@@ -169,7 +169,6 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 #endif
 
     Jid contactJid = ANotification.data.value(NDR_CONTACT_JID).toString();
-    QString popupBody = ANotification.data.value(NDR_POPUP_HTML).toString();
     QString imgPath;
     QString iconPath;
 
@@ -180,18 +179,6 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
     qDebug() << "NDR_POPUP_CAPTION" << ANotification.data.value(NDR_POPUP_CAPTION).toString();
     qDebug() << "NDR_POPUP_TITLE" << ANotification.data.value(NDR_POPUP_TITLE).toString();
     qDebug() << "NDR_POPUP_HTML" << ANotification.data.value(NDR_POPUP_HTML).toString();
-#endif
-
-    popupBody = popupBody.replace("<br />", "\n");
-
-#ifndef NO_QT_DEBUG
-    qDebug() << "NDR_POPUP_HTML trimed 1" << popupBody;
-#endif
-
-    popupBody = popupBody.replace(QRegExp("<[^>]*>"), "");
-
-#ifndef NO_QT_DEBUG
-    qDebug() << "NDR_POPUP_HTML trimed 2" << popupBody;
 #endif
 
     if (FAvatars)
@@ -209,7 +196,16 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
     //    if(FUseFreedesktopSpec)
     if (FRemoveTags)
     {
-        notifyArgs.append(/*ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+*/popupBody/*ANotification.data.value(NDR_POPUP_HTML).toString()*/);
+        QString popupBody = ANotification.data.value(NDR_POPUP_HTML).toString();
+        popupBody = popupBody.replace("<br />", "\n");
+#ifndef NO_QT_DEBUG
+        qDebug() << "NDR_POPUP_HTML trimed 1" << popupBody;
+#endif
+        popupBody = popupBody.replace(QRegExp("<[^>]*>"), "");
+#ifndef NO_QT_DEBUG
+        qDebug() << "NDR_POPUP_HTML trimed 2" << popupBody;
+#endif
+        notifyArgs.append(popupBody);
     }
     else
     {
