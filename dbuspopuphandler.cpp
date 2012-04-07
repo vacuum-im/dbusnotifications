@@ -1,4 +1,4 @@
-#ifndef NO_QT_DEBUG
+#ifndef QT_NO_DEBUG
 #  include <QDebug>
 #endif
 
@@ -100,14 +100,14 @@ bool DbusPopupHandler::initObjects()
     FUseFreedesktopSpec = true;
     FRemoveTags = false;
     FAllowActions = true;
-#ifndef NO_QT_DEBUG
+#ifndef QT_NO_DEBUG
     qDebug() << "DBus Notifys: DBus interface created successfully.";
 #endif
 
     QDBusMessage reply = FNotify->call(QDBus::Block,"GetServerInformation");
     if(QDBusMessage::ErrorMessage != reply.type())
     {
-#ifndef NO_QT_DEBUG
+#ifndef QT_NO_DEBUG
         for (int i=0;i<reply.arguments().count();i++)
         {
             qDebug() << reply.arguments().at(i).toString();
@@ -164,7 +164,7 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 {
     if (AOrder!=NHO_DBUSPOPUP||!(AKind&INotification::PopupWindow)) return false;
 
-#ifndef NO_QT_DEBUG
+#ifndef QT_NO_DEBUG
     qDebug() << "DBus Notifys: showNotification request accepted.";
 #endif
 
@@ -174,7 +174,7 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 
     FTimeout = Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt()*1000;
 
-#ifndef NO_QT_DEBUG
+#ifndef QT_NO_DEBUG
     qDebug() << "NDR_TOOLTIP" << ANotification.data.value(NDR_TOOLTIP).toString();
     qDebug() << "NDR_POPUP_CAPTION" << ANotification.data.value(NDR_POPUP_CAPTION).toString();
     qDebug() << "NDR_POPUP_TITLE" << ANotification.data.value(NDR_POPUP_TITLE).toString();
@@ -198,11 +198,11 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
     {
         QString popupBody = ANotification.data.value(NDR_POPUP_HTML).toString();
         popupBody = popupBody.replace("<br />", "\n");
-#ifndef NO_QT_DEBUG
+#ifndef QT_NO_DEBUG
         qDebug() << "NDR_POPUP_HTML trimed 1" << popupBody;
 #endif
         popupBody = popupBody.replace(QRegExp("<[^>]*>"), "");
-#ifndef NO_QT_DEBUG
+#ifndef QT_NO_DEBUG
         qDebug() << "NDR_POPUP_HTML trimed 2" << popupBody;
 #endif
         notifyArgs.append(popupBody);
@@ -246,7 +246,7 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 
 void DbusPopupHandler::onActionInvoked(unsigned int notifyId, QString action)
 {
-#ifndef NO_QT_DEBUG
+#ifndef QT_NO_DEBUG
     qDebug() << "DBus Notifys: action "<<action<<" invoked";
 #endif
     if (action=="actOne")
