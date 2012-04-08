@@ -20,20 +20,20 @@
         <translation>Позволяет использовать DBus для вывода уведомлений</translation>
     </message>
     <message>
+        <source>DBus Popup</source>
+        <translation>DBus уведомления</translation>
+    </message>
+    <message>
+        <source>Notifications show provider: %1</source>
+        <translation>Система отображения уведомлений: %1</translation>
+    </message>
+    <message>
         <source>Allow actions in notifications</source>
         <translation>Предоставлять дополнительные дейсвия в уведомлениях</translation>
     </message>
     <message>
         <source>Remove html tags</source>
         <translation>Не использовать HTML для форматирования оповещений</translation>
-    </message>
-    <message>
-        <source>DBus Popup</source>
-        <translation>DBus уведомления</translation>
-    </message>
-    <message>
-        <source>Notifications provider: %1</source>
-        <translation>Источник уведомлений: %1</translation>
     </message>
 </context>
 </TS>
