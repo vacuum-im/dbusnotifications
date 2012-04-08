@@ -36,7 +36,10 @@ win32 {
 }
 
 #Translation
-TRANSLATIONS        = ./translations/src/ru_RU/$${TARGET}.ts
+TRANSLATIONS        = ./translations/ru/$${TARGET}.ts
+TRANSLATIONS        = ./translations/uk/$${TARGET}.ts
+TRANSLATIONS        = ./translations/pl/$${TARGET}.ts
+TRANSLATIONS        = ./translations/de/$${TARGET}.ts
 
 #Install
 
