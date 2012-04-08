@@ -8,12 +8,13 @@
 
 #include "dbuspopuphandler.h"
 
-DbusPopupHandler::DbusPopupHandler()
+DbusPopupHandler::DbusPopupHandler() :
+    FAvatars(NULL),
+    FNotifications(NULL),
+    FOptionsManager(NULL),
+    FNotify(NULL)
 {
-    FAvatars = NULL;
-    FNotifications = NULL;
-    FOptionsManager = NULL;
-    FNotify = NULL;
+
 }
 
 DbusPopupHandler::~DbusPopupHandler()
@@ -58,33 +59,6 @@ bool DbusPopupHandler::initConnections(IPluginManager *APluginManager, int &/*AI
     return true;
 }
 
-QMultiMap<int, IOptionsWidget *> DbusPopupHandler::optionsWidgets(const QString &ANodeId, QWidget *AParent)
-{
-    QMultiMap<int, IOptionsWidget *> widgets;
-    if (FOptionsManager && ANodeId==OPN_DBUSPOPUP)
-    {
-        widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->optionsHeaderWidget(tr("Notifications provider: %1").arg(FServerName+" "+FServerVendor+" "+FServerVersion),AParent));
-        widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->optionsNodeWidget(Options::node(OPV_DP_ALLOW_ACTIONS),tr("Allow actions in notifications"),AParent));
-        widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->optionsNodeWidget(Options::node(OPV_DP_REMOVE_TAGS),tr("Remove html tags"),AParent));
-    }
-    return widgets;
-}
-
-void DbusPopupHandler::onOptionsOpened()
-{
-    Options::node(OPV_DP_ALLOW_ACTIONS).setValue(FAllowActions);
-    Options::node(OPV_DP_REMOVE_TAGS).setValue(FRemoveTags);
-}
-
-void DbusPopupHandler::onOptionsChanged(const OptionsNode &ANode)
-{
-    if (ANode.path() == OPV_DP_ALLOW_ACTIONS) {
-        FAllowActions = Options::node(OPV_DP_ALLOW_ACTIONS).value().toBool();
-    } else if (ANode.path() == OPV_DP_REMOVE_TAGS) {
-        FRemoveTags = Options::node(OPV_DP_REMOVE_TAGS).value().toBool();
-    }
-}
-
 bool DbusPopupHandler::initObjects()
 {
     FNotify = new QDBusInterface("org.freedesktop.Notifications",
@@ -105,10 +79,10 @@ bool DbusPopupHandler::initObjects()
 #endif
 
     QDBusMessage reply = FNotify->call(QDBus::Block,"GetServerInformation");
-    if(QDBusMessage::ErrorMessage != reply.type())
+    if (QDBusMessage::ErrorMessage != reply.type())
     {
 #ifndef QT_NO_DEBUG
-        for (int i=0;i<reply.arguments().count();i++)
+        for (int i=0; i<reply.arguments().count(); i++)
         {
             qDebug() << reply.arguments().at(i).toString();
         };
@@ -151,6 +125,9 @@ bool DbusPopupHandler::initSettings()
     FTimeout = 6000;
     FUpdateNotify = false;
 
+    Options::setDefaultValue(OPV_DP_ALLOW_ACTIONS, FAllowActions);
+    Options::setDefaultValue(OPV_DP_REMOVE_TAGS, FRemoveTags);
+
     if (FOptionsManager)
     {
         IOptionsDialogNode dnode = { ONO_DBUSPOPUP, OPN_DBUSPOPUP, tr("DBus Popup"), MNI_DBUSPOPUP };
@@ -160,9 +137,44 @@ bool DbusPopupHandler::initSettings()
     return true;
 }
 
+void DbusPopupHandler::onOptionsOpened()
+{
+    onOptionsChanged(Options::node(OPV_DP_ALLOW_ACTIONS));
+    onOptionsChanged(Options::node(OPV_DP_REMOVE_TAGS));
+}
+
+void DbusPopupHandler::onOptionsChanged(const OptionsNode &ANode)
+{
+    if (ANode.path() == OPV_DP_ALLOW_ACTIONS) {
+        FAllowActions = Options::node(OPV_DP_ALLOW_ACTIONS).value().toBool();
+    } else if (ANode.path() == OPV_DP_REMOVE_TAGS) {
+        FRemoveTags = Options::node(OPV_DP_REMOVE_TAGS).value().toBool();
+    }
+}
+
+QMultiMap<int, IOptionsWidget *> DbusPopupHandler::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+{
+    QMultiMap<int, IOptionsWidget *> widgets;
+    if (FOptionsManager && ANodeId==OPN_DBUSPOPUP)
+    {
+        widgets.insertMulti(OWO_DBUSPOPUP,
+                            FOptionsManager->optionsHeaderWidget(tr("Notifications show provider: %1").arg(FServerVendor+" "+FServerName+" "+FServerVersion),AParent));
+        widgets.insertMulti(OWO_DBUSPOPUP,
+                            FOptionsManager->optionsNodeWidget(Options::node(OPV_DP_ALLOW_ACTIONS),
+                            tr("Allow actions in notifications"),
+                            AParent));
+        widgets.insertMulti(OWO_DBUSPOPUP,
+                            FOptionsManager->optionsNodeWidget(Options::node(OPV_DP_REMOVE_TAGS),
+                            tr("Remove html tags"),
+                            AParent));
+    }
+    return widgets;
+}
+
 bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification)
 {
-    if (AOrder!=NHO_DBUSPOPUP||!(AKind&INotification::PopupWindow)) return false;
+    if (AOrder != NHO_DBUSPOPUP || !(AKind & INotification::PopupWindow))
+        return false;
 
 #ifndef QT_NO_DEBUG
     qDebug() << "DBus Notifys: showNotification request accepted.";
