@@ -40,6 +40,8 @@ endif (WIN32)
 set(SOURCES dbuspopuphandler.cpp )
 set(HEADERS dbuspopuphandler.h )
 
+install(DIRECTORY "resources/menuicons" DESTINATION "${INSTALL_RESOURCES}")
+
 qt4_wrap_cpp(MOC_SOURCES ${HEADERS})
 qt4_add_resources(RCC_SOURCES ${RCCS})
 

@@ -208,7 +208,7 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
     //    if(FUseFreedesktopSpec)
     if (FRemoveTags)
     {
-        QString popupBody = ANotification.data.value(NDR_POPUP_HTML).toString();
+		QString popupBody = ANotification.data.value(NDR_POPUP_TITLE).toString()+":\n"+ANotification.data.value(NDR_POPUP_HTML).toString();
         popupBody = popupBody.replace("<br />", "\n");
 #ifndef QT_NO_DEBUG
         qDebug() << "NDR_POPUP_HTML trimed 1" << popupBody;
@@ -221,7 +221,7 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
     }
     else
     {
-        notifyArgs.append(/*ANotification.data.value(NDR_TOOLTIP).toString()+":\n"+*/ANotification.data.value(NDR_POPUP_HTML).toString());
+		notifyArgs.append(ANotification.data.value(NDR_POPUP_TITLE).toString()+":\n"+ANotification.data.value(NDR_POPUP_HTML).toString());
     }
     //body
     QStringList acts;

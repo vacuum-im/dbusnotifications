@@ -29,7 +29,7 @@
 #define NHO_DBUSPOPUP               3000
 
 //Menu Icons
-#define MNI_DBUSPOPUP               "dbuspopup"
+#define MNI_DBUSPOPUP               "dbusnotifications"
 
 //Option Nodes
 #define OPN_DBUSPOPUP               "DBus popups"
