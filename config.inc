@@ -57,4 +57,4 @@ isEmpty(VACUUM_BUILD_PATH) {
 
 #Should be included from SDK
 TARGET_UTILS             = vacuumutils
-unix:VERSION_UTILS       = 1.2.0
+unix:VERSION_UTILS       = 1.17.0
