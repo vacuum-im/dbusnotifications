@@ -1,0 +1,6 @@
+[main]
+host = http://www.transifex.net
+
+[vacuum-im.dbusnotificationsts]
+file_filter = <lang>/dbusnotifications.ts
+source_lang = ru
