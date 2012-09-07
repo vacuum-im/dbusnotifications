@@ -12,14 +12,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ignore</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DBus Popup</source>
         <translation type="unfinished"></translation>
     </message>
@@ -33,6 +25,14 @@
     </message>
     <message>
         <source>Remove html tags</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

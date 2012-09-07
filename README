@@ -1,0 +1,52 @@
+INFORMATION
+===========
+  Popup notofications over DBus extension plugin for Vacuum-IM
+
+  Authors:
+    Crying Angel - <cangel@inbox.ru>
+    Andrey Karepin - <egdfree@opensuse.org>
+    Alexey Ivanov - <alexey.ivanes@gmail.com>
+    Sergey A Potapov - <potapov.s.a@gmail.com>
+
+  Web Site:
+    http://code.google.com/p/vacuum-plugins/
+
+  Source:
+    http://code.google.com/p/vacuum-im
+
+  Jabber conference:
+    vacuum@conference.jabber.ru
+
+  Forum:
+    http://forum.jrudevels.org/viewforum.php?f=11
+
+
+BUILD AND INSTALL
+=================
+  Configure
+  ---------
+  You should use the same settings, as at vacuum build
+  VACUUM_SDK_PATH - full path to vacuum SDK (for defaults look into qmake/config.inc or cmake/config.cmake)
+
+  Unix example
+  ------------
+  qmake VACUUM_SDK_PATH="/usr/include/vacuum" CONFIG-=debug CONFIG-=debug_and_install
+  make
+  sudo make install
+
+
+CHANGELOG
+=========
+  LEGEND: [+]-New feature [*]-Enhancement [-]-Bug fix
+
+  v1.0.2
+  ------
+  [*] Added options page
+  
+  v1.0.1
+  ------
+  [-] Removed console debug output messages in release
+  
+  v1.0.0
+  ------
+  [!] Initial version
