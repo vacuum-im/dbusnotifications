@@ -26,7 +26,7 @@ void DbusPopupHandler::pluginInfo(IPluginInfo *APluginInfo)
 {
     APluginInfo->name = tr("Dbus Popup Notifications Handler");
     APluginInfo->description = tr("Allows other modules use DBus to show notifications");
-    APluginInfo->version = "1.0.2";
+    APluginInfo->version = "1.0.3";
     APluginInfo->author = "Crying Angel";
     APluginInfo->homePage = "http://www.vacuum-im.org";
     APluginInfo->dependences.append(NOTIFICATIONS_UUID);
@@ -53,8 +53,7 @@ bool DbusPopupHandler::initConnections(IPluginManager *APluginManager, int &/*AI
     connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
     connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
-    connect (APluginManager->instance(), SIGNAL(aboutToQuit()), this, SLOT(onApplicationQuit()));
-    //        connect (FNotifications->instance(), SIGNAL(notificationRemoved(int)),this,SLOT(onWindowNotifyRemoved(int)));
+    connect(APluginManager->instance(),SIGNAL(aboutToQuit()),this,SLOT(onApplicationQuit()));
 
     return true;
 }
@@ -62,7 +61,8 @@ bool DbusPopupHandler::initConnections(IPluginManager *APluginManager, int &/*AI
 bool DbusPopupHandler::initObjects()
 {
     FNotify = new QDBusInterface("org.freedesktop.Notifications",
-                                 "/org/freedesktop/Notifications","org.freedesktop.Notifications",
+                                 "/org/freedesktop/Notifications",
+                                 "org.freedesktop.Notifications",
                                  QDBusConnection::sessionBus()/*, this*/);
     if(FNotify->lastError().type() != QDBusError::NoError)
     {
@@ -71,7 +71,7 @@ bool DbusPopupHandler::initObjects()
 #endif
         return false;
     }
-    FUseFreedesktopSpec = true;
+
     FRemoveTags = false;
     FAllowActions = true;
 #ifndef QT_NO_DEBUG
@@ -112,7 +112,6 @@ bool DbusPopupHandler::initObjects()
     }
 #endif
 
-    //        connect(FNotify,SIGNAL(NotificationClosed(uint,uint)),this,SLOT(onNotifyClosed(uint,uint)));
     connect(FNotify,SIGNAL(ActionInvoked(uint,QString)),this,SLOT(onActionInvoked(uint,QString)));
 
     FNotifications->insertNotificationHandler(NHO_DBUSPOPUP, this);
@@ -145,9 +144,12 @@ void DbusPopupHandler::onOptionsOpened()
 
 void DbusPopupHandler::onOptionsChanged(const OptionsNode &ANode)
 {
-    if (ANode.path() == OPV_DP_ALLOW_ACTIONS) {
+    if (ANode.path() == OPV_DP_ALLOW_ACTIONS)
+    {
         FAllowActions = Options::node(OPV_DP_ALLOW_ACTIONS).value().toBool();
-    } else if (ANode.path() == OPV_DP_REMOVE_TAGS) {
+    }
+    else if (ANode.path() == OPV_DP_REMOVE_TAGS)
+    {
         FRemoveTags = Options::node(OPV_DP_REMOVE_TAGS).value().toBool();
     }
 }
@@ -161,12 +163,12 @@ QMultiMap<int, IOptionsWidget *> DbusPopupHandler::optionsWidgets(const QString 
                             FOptionsManager->optionsHeaderWidget(tr("Notifications show provider: %1").arg(FServerVendor+" "+FServerName+" "+FServerVersion),AParent));
         widgets.insertMulti(OWO_DBUSPOPUP,
                             FOptionsManager->optionsNodeWidget(Options::node(OPV_DP_ALLOW_ACTIONS),
-                            tr("Allow actions in notifications"),
-                            AParent));
+                                                               tr("Allow actions in notifications"),
+                                                               AParent));
         widgets.insertMulti(OWO_DBUSPOPUP,
                             FOptionsManager->optionsNodeWidget(Options::node(OPV_DP_REMOVE_TAGS),
-                            tr("Remove html tags"),
-                            AParent));
+                                                               tr("Remove html tags"),
+                                                               AParent));
     }
     return widgets;
 }
@@ -201,14 +203,12 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
     QList<QVariant> notifyArgs;
     notifyArgs.append("Vacuum IM");                                             //app-name
     notifyArgs.append((uint)ANotifyId);                                         //id;
-    //    if(!FUseFreedesktopSpec)
-    //        notifyArgs.append("");                                                  //event-id
     notifyArgs.append(iconPath);                                                //app-icon(path to icon on disk)
     notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString());  //summary (notification title)
-    //    if(FUseFreedesktopSpec)
+
     if (FRemoveTags)
     {
-		QString popupBody = ANotification.data.value(NDR_POPUP_TITLE).toString()+":\n"+ANotification.data.value(NDR_POPUP_HTML).toString();
+        QString popupBody = ANotification.data.value(NDR_POPUP_TITLE).toString()+":\n"+ANotification.data.value(NDR_POPUP_HTML).toString();
         popupBody = popupBody.replace("<br />", "\n");
 #ifndef QT_NO_DEBUG
         qDebug() << "NDR_POPUP_HTML trimed 1" << popupBody;
@@ -221,7 +221,7 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
     }
     else
     {
-		notifyArgs.append(ANotification.data.value(NDR_POPUP_TITLE).toString()+":\n"+ANotification.data.value(NDR_POPUP_HTML).toString());
+        notifyArgs.append(ANotification.data.value(NDR_POPUP_TITLE).toString()+":\n"+ANotification.data.value(NDR_POPUP_HTML).toString());
     }
     //body
     QStringList acts;
@@ -240,7 +240,7 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
     notifyArgs.append(FTimeout);                                                //timeout
 
     QDBusReply<uint> reply = FNotify->callWithArgumentList(QDBus::Block,"Notify",notifyArgs);
-    if(reply.isValid())
+    if (reply.isValid())
     {
         if (FUpdateNotify)
         {
@@ -269,20 +269,10 @@ void DbusPopupHandler::onActionInvoked(unsigned int notifyId, QString action)
     FNotify->call("CloseNotification",notifyId);
 }
 
-void DbusPopupHandler::onWindowNotifyRemoved(/*int ANotifyId*/)
-{
-
-}
-
 void DbusPopupHandler::onApplicationQuit()
 {
     FNotifications->removeNotificationHandler(NHO_DBUSPOPUP, this);
 }
-
-//void DbusPopupHandler::onWindowNotifyDestroyed()
-//{
-
-//}
 
 Q_EXPORT_PLUGIN2(plg_notifications, DbusPopupHandler)
 
