@@ -45,50 +45,49 @@
 #define OPV_DP_REMOVE_TAGS          "dbuspopup.remove-tags"
 
 class DbusPopupHandler :
-        public QObject,
-        public IPlugin,
-        public INotificationHandler,
-        public IOptionsHolder
+		public QObject,
+		public IPlugin,
+		public INotificationHandler,
+		public IOptionsHolder
 {
-    Q_OBJECT
-    Q_INTERFACES(IPlugin INotificationHandler IOptionsHolder)
+	Q_OBJECT
+	Q_INTERFACES(IPlugin INotificationHandler IOptionsHolder)
 public:
-    DbusPopupHandler();
-    ~DbusPopupHandler();
-    //IPlugin
-    virtual QObject *instance() { return this; }
-    virtual QUuid pluginUuid() const { return DBUSPOPUPHANDLER_UUID; }
-    virtual void pluginInfo(IPluginInfo *APluginInfo);
-    virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-    virtual bool initObjects();
-    virtual bool initSettings();
-    virtual bool startPlugin() { return true; }
-    //IOptionsHolder
-    virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
-    //INotificationHandler
-    virtual bool showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification);
+	DbusPopupHandler();
+	~DbusPopupHandler();
+	//IPlugin
+	virtual QObject *instance() { return this; }
+	virtual QUuid pluginUuid() const { return DBUSPOPUPHANDLER_UUID; }
+	virtual void pluginInfo(IPluginInfo *APluginInfo);
+	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+	virtual bool initObjects();
+	virtual bool initSettings();
+	virtual bool startPlugin() { return true; }
+	//IOptionsHolder
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	//INotificationHandler
+	virtual bool showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification);
 
 protected slots:
-    void onOptionsOpened();
-    void onOptionsChanged(const OptionsNode &ANode);
-    void onActionInvoked(unsigned int notifyId, QString action);
-    void onApplicationQuit();
+	void onOptionsOpened();
+	void onOptionsChanged(const OptionsNode &ANode);
+	void onActionInvoked(unsigned int notifyId, QString action);
+	void onApplicationQuit();
 
 private:
-    IAvatars *FAvatars;
-    INotifications *FNotifications;
-    IOptionsManager *FOptionsManager;
-    QDBusInterface *FNotify;
+	IAvatars *FAvatars;
+	INotifications *FNotifications;
+	IOptionsManager *FOptionsManager;
+	QDBusInterface *FNotify;
 
-    QString FServerName;
-    QString FServerVendor;
-    QString FServerVersion;
+	QString FServerName;
+	QString FServerVendor;
+	QString FServerVersion;
 
-    int FTimeout;
-    bool FUpdateNotify;
-    bool FRemoveTags;
-    bool FAllowActions;
+	int FTimeout;
+	bool FUpdateNotify;
+	bool FRemoveTags;
+	bool FAllowActions;
 };
 
 #endif // DBUSPOPUPHANDLER_H
-

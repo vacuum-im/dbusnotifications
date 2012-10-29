@@ -39,6 +39,10 @@ CHANGELOG
 =========
   LEGEND: [+]-New feature [*]-Enhancement [-]-Bug fix
 
+  v1.1.0
+  ------
+  [-] Use one NDR_TOOLTIP not two (caption and titile)
+
   v1.0.2
   ------
   [*] Added options page
