@@ -1,7 +1,4 @@
-#ifndef QT_NO_DEBUG
 #include <QDebug>
-#endif
-
 #include <definitions/notificationdataroles.h>
 #include <definitions/optionvalues.h>
 #include <utils/options.h>
@@ -65,28 +62,22 @@ bool DbusPopupHandler::initObjects()
 								 QDBusConnection::sessionBus()/*, this*/);
 	if(FNotify->lastError().type() != QDBusError::NoError)
 	{
-#ifndef QT_NO_DEBUG
 		qWarning() << "DBus Notifys: Unable to create interface.";
-#endif
 		return false;
 	}
 
 	FRemoveTags = false;
 	FAllowActions = true;
 
-#ifndef QT_NO_DEBUG
 	qDebug() << "DBus Notifys: DBus interface created successfully.";
-#endif
 
 	QDBusMessage reply = FNotify->call(QDBus::Block,"GetServerInformation");
 	if (QDBusMessage::ErrorMessage != reply.type())
 	{
-#ifndef QT_NO_DEBUG
 		for (int i=0; i<reply.arguments().count(); i++)
 		{
 			qDebug() << reply.arguments().at(i).toString();
 		};
-#endif
 		FServerName = reply.arguments().at(0).toString();
 		FServerVendor = reply.arguments().at(1).toString();
 		FServerVersion = reply.arguments().at(2).toString();
@@ -105,12 +96,10 @@ bool DbusPopupHandler::initObjects()
 			FAllowActions = false;
 		}
 	}
-#ifndef QT_NO_DEBUG
 	else
 	{
 		qWarning() << "DBus Error: " << reply.errorMessage();
 	}
-#endif
 
 	connect(FNotify,SIGNAL(ActionInvoked(uint,QString)),this,SLOT(onActionInvoked(uint,QString)));
 
@@ -173,9 +162,7 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 	if (AOrder != NHO_DBUSPOPUP || !(AKind & INotification::PopupWindow))
 		return false;
 
-#ifndef QT_NO_DEBUG
 	qDebug() << "DBus Notifys: showNotification request accepted.";
-#endif
 
 	Jid contactJid = ANotification.data.value(NDR_CONTACT_JID).toString();
 	QString imgPath;
@@ -183,12 +170,10 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 
 	FTimeout = Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt()*1000;
 
-#ifndef QT_NO_DEBUG
 	qDebug() << "NDR_TOOLTIP" << ANotification.data.value(NDR_TOOLTIP).toString();
 	qDebug() << "NDR_POPUP_CAPTION" << ANotification.data.value(NDR_POPUP_CAPTION).toString();
 	qDebug() << "NDR_POPUP_TITLE" << ANotification.data.value(NDR_POPUP_TITLE).toString();
 	qDebug() << "NDR_POPUP_HTML" << ANotification.data.value(NDR_POPUP_HTML).toString();
-#endif
 
 	if (FAvatars)
 	{
@@ -199,19 +184,17 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 	notifyArgs.append("Vacuum-IM");												//app-name
 	notifyArgs.append((uint)ANotifyId);											//id;
 	notifyArgs.append(iconPath);												//app-icon (path to icon on disk)
-	notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString());	//summary (notification title)
+	notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString());		//summary (notification title)
 
 	QString popupBody = ANotification.data.value(NDR_POPUP_HTML).toString();
 	if (FRemoveTags)
 	{
 		popupBody = popupBody.replace("<br />", "\n");
-#ifndef QT_NO_DEBUG
 		qDebug() << "NDR_POPUP_HTML trimed 1" << popupBody;
-#endif
+
 		popupBody = popupBody.replace(QRegExp("<[^>]*>"), "");
-#ifndef QT_NO_DEBUG
 		qDebug() << "NDR_POPUP_HTML trimed 2" << popupBody;
-#endif
+
 		notifyArgs.append(popupBody);
 	}
 	else
@@ -242,20 +225,17 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 			ANotifyId = reply.value();
 		}
 	}
-#ifndef QT_NO_DEBUG
 	else
 	{
 		qWarning() << "DBus Notifys Error: " << reply.error();
 	}
-#endif
 	return true;
 }
 
 void DbusPopupHandler::onActionInvoked(unsigned int notifyId, QString action)
 {
-#ifndef QT_NO_DEBUG
 	qDebug() << "DBus Notifys: action " << action << " invoked";
-#endif
+
 	if (action == "actOne")
 		FNotifications->activateNotification(notifyId);
 	else
