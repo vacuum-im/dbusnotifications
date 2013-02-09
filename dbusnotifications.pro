@@ -60,6 +60,9 @@ win32 {
   INSTALL_TRANSLATIONS     = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/Contents/$$INSTALL_RES_DIR/translations
 }
 
+#Release must be quiet, without debug output
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT
+
 target.path        = $$INSTALL_PLUGINS
 resources.path     = $$INSTALL_RESOURCES
 resources.files    = ./resources/*

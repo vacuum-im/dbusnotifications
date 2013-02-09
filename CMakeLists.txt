@@ -27,6 +27,20 @@ if (WIN32)
 	set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif (WIN32)
 
+#Release must be quiet, without debug output
+
+if(NOT CMAKE_BUILD_TYPE)
+set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+"Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+message(STATUS "No build type selected, default is Debug")
+endif(NOT CMAKE_BUILD_TYPE)
+
+string(TOUPPER ${CMAKE_BUILD_TYPE} IS_CONFIG_RELEASE)
+
+if(NOT IS_CONFIG_RELEASE STREQUAL "DEBUG")
+add_definitions(-DQT_NO_DEBUG_OUTPUT -DQT_NO_WARNING_OUTPUT)
+endif()
+
 include(${QT_USE_FILE})
 
 add_definitions(-DQT_PLUGIN -DQT_SHARED)
