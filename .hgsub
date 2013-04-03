@@ -1,2 +1,2 @@
-cmake = https://buildsys-cmake.vacuum-plugins.googlecode.com/hg/
-qmake = https://buildsys-qmake.vacuum-plugins.googlecode.com/hg/
+cmake = https://code.google.com/p/vacuum-plugins.buildsys-cmake/
+qmake = https://code.google.com/p/vacuum-plugins.buildsys-qmake/
