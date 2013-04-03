@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Allow actions in notifications</source>
-        <translation>Предоставлять дополнительные дейсвия в уведомлениях</translation>
+        <translation>Предоставлять дополнительные действия в уведомлениях</translation>
     </message>
     <message>
         <source>Remove html tags</source>
