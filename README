@@ -39,9 +39,14 @@ CHANGELOG
 =========
   LEGEND: [+]-New feature [*]-Enhancement [-]-Bug fix
 
+  v1.2.0
+  ------
+  [-] Detect dbus notifications provider features for "show buttons" option
+  [-] Always remove HTML tags. Irrespective of dbus notifications provider support
+
   v1.1.0
   ------
-  [-] Use one NDR_TOOLTIP not two (caption and titile)
+  [-] Use one NDR_TOOLTIP, not both (caption and titile)
 
   v1.0.2
   ------

@@ -20,38 +20,22 @@
 
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusReply>
+
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/iavatars.h>
-
-#define DBUSPOPUPHANDLER_UUID  "{63685fbc-5a2d-4e8c-b9d5-d69ea8fbdb4e}"
-#define NHO_DBUSPOPUP               3000
-
-//Menu Icons
-#define MNI_DBUSPOPUP               "dbusnotifications"
-
-//Option Nodes
-#define OPN_DBUSPOPUP               "DBus popups"
-
-//Option Node Order
-#define ONO_DBUSPOPUP               900
-
-//Option Widget Order
-#define OWO_DBUSPOPUP               500
-
-//Options
-#define OPV_DP_ALLOW_ACTIONS        "dbuspopup.allow-actions"
-#define OPV_DP_REMOVE_TAGS          "dbuspopup.remove-tags"
+#include "idbusnotifications.h"
 
 class DbusPopupHandler :
 		public QObject,
 		public IPlugin,
 		public INotificationHandler,
-		public IOptionsHolder
+		public IOptionsHolder,
+		public IDBusNotifications
 {
 	Q_OBJECT
-	Q_INTERFACES(IPlugin INotificationHandler IOptionsHolder)
+	Q_INTERFACES(IPlugin INotificationHandler IOptionsHolder IDBusNotifications)
 public:
 	DbusPopupHandler();
 	~DbusPopupHandler();
@@ -68,25 +52,28 @@ public:
 	//INotificationHandler
 	virtual bool showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification);
 
+protected:
+	QString filter(const QString &text);
+	void closeNotification(const unsigned int notifyId);
+
 protected slots:
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onActionInvoked(unsigned int notifyId, QString action);
+	void onNotificationActivated(int notifyId);
+	void onNotificationRemoved(int notifyId);
+	void onNotificationClosed(unsigned int notifyId, unsigned int reason);
 	void onApplicationQuit();
 
 private:
 	IAvatars *FAvatars;
 	INotifications *FNotifications;
 	IOptionsManager *FOptionsManager;
-	QDBusInterface *FNotify;
+	QDBusInterface *FNotifyInterface;
 
-	QString FServerName;
-	QString FServerVendor;
-	QString FServerVersion;
+	ServerInfo *FServerInfo;
 
-	int FTimeout;
-	bool FUpdateNotify;
-	bool FRemoveTags;
+	QMap <int, int> FNotifies;
 	bool FAllowActions;
 };
 

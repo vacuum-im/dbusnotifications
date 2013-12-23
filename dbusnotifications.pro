@@ -13,5 +13,5 @@ CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPU
 
 #Translation
 TRANS_SOURCE_ROOT   = .
-TRANS_BUILD_ROOT = $${OUT_PWD}
+TRANS_BUILD_ROOT    = $${OUT_PWD}
 include(translations/languages.inc)
