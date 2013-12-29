@@ -31,9 +31,5 @@
         <source>Allow actions in notifications</source>
         <translation>Allow actions in notifications</translation>
     </message>
-    <message>
-        <source>Remove html tags</source>
-        <translation>Remove html tags</translation>
-    </message>
 </context>
 </TS>

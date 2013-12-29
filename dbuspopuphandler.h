@@ -60,9 +60,6 @@ protected slots:
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onActionInvoked(unsigned int notifyId, QString action);
-	void onNotificationActivated(int notifyId);
-	void onNotificationRemoved(int notifyId);
-	void onNotificationClosed(unsigned int notifyId, unsigned int reason);
 	void onApplicationQuit();
 
 private:

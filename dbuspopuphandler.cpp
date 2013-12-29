@@ -59,11 +59,6 @@ bool DbusPopupHandler::initConnections(IPluginManager *APluginManager, int &/*AI
 	if(plugin)
 	{
 		FNotifications = qobject_cast<INotifications *>(plugin->instance());
-		if(FNotifications)
-		{
-			connect(FNotifications->instance(),SIGNAL(notificationActivated(int)), SLOT(onNotificationActivated(int)));
-			connect(FNotifications->instance(),SIGNAL(notificationRemoved(int)), SLOT(onNotificationRemoved(int)));
-		}
 	}
 
 	connect(APluginManager->instance(),SIGNAL(aboutToQuit()),this,SLOT(onApplicationQuit()));
@@ -115,8 +110,6 @@ bool DbusPopupHandler::initObjects()
 
 	if (FAllowActions)
 		connect(FNotifyInterface,SIGNAL(ActionInvoked(uint,QString)),this,SLOT(onActionInvoked(uint,QString)));
-
-	connect(FNotifyInterface,SIGNAL(NotificationClosed(uint,uint)),this,SLOT(onNotificationClosed(uint,uint)));
 
 	FNotifications->insertNotificationHandler(NHO_DBUSPOPUP, this);
 
@@ -210,35 +203,11 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 void DbusPopupHandler::onActionInvoked(unsigned int notifyId, QString action)
 {
 	if (action == "action_show")
-	{
 		FNotifications->activateNotification(FNotifies.value((int)notifyId));
-	}
 	else
 		FNotifications->removeNotification((int)notifyId);
-}
 
-void DbusPopupHandler::onNotificationClosed(unsigned int notifyId, unsigned int reason)
-{
-	if (reason == 2)
-		FNotifications->removeNotification((int)notifyId);
-
-	closeNotification(notifyId);
-}
-
-void DbusPopupHandler::onNotificationActivated(int notifyId)
-{
-	closeNotification(notifyId);
-}
-
-void DbusPopupHandler::onNotificationRemoved(int notifyId)
-{
-	closeNotification(notifyId);
-}
-
-void DbusPopupHandler::closeNotification(unsigned int notifyId)
-{
 	FNotifyInterface->call("CloseNotification", notifyId);
-	FNotifies.remove(int(notifyId));
 }
 
 QString DbusPopupHandler::filter(const QString &text)

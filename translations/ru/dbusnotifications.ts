@@ -31,9 +31,5 @@
         <source>Allow actions in notifications</source>
         <translation>Предоставлять дополнительные действия в уведомлениях</translation>
     </message>
-    <message>
-        <source>Remove html tags</source>
-        <translation>Не использовать HTML для форматирования оповещений</translation>
-    </message>
 </context>
 </TS>
