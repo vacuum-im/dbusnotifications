@@ -171,7 +171,7 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 	notifyArgs.append(iconPath);
 	notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString());
 
-	QString popupBody = filter(ANotification.data.value(NDR_POPUP_HTML).toString());
+	QString popupBody = ANotification.data.value(NDR_POPUP_TEXT).toString();
 	notifyArgs.append(popupBody);
 
 	QStringList actions;
@@ -208,39 +208,6 @@ void DbusPopupHandler::onActionInvoked(unsigned int notifyId, QString action)
 		FNotifications->removeNotification((int)notifyId);
 
 	FNotifyInterface->call("CloseNotification", notifyId);
-}
-
-QString DbusPopupHandler::filter(const QString &text)
-{
-	QString out = text;
-	out.replace(QLatin1Char('\n'), QString());
-	out.replace(QLatin1String("</p>"), QLatin1String("\n"), Qt::CaseInsensitive);
-	out.replace(QLatin1String("<br />"), QLatin1String("\n"), Qt::CaseInsensitive);
-
-	int lt = 0;
-	int gt = 0;
-	forever
-	{
-		lt = out.indexOf(QLatin1Char('<'), lt);
-		if (lt == -1)
-			break;
-		gt = out.indexOf(QLatin1Char('>'), lt);
-		if (gt == -1)
-		{
-			out.remove(lt, out.size() - lt);
-			break;
-		}
-		out.remove(lt, gt - lt + 1);
-	}
-
-	out.replace(QLatin1String("&gt;"), QLatin1String(">"));
-	out.replace(QLatin1String("&lt;"), QLatin1String("<"));
-	out.replace(QLatin1String("&quot;"), QLatin1String("\""));
-	out.replace(QLatin1String("&nbsp;"), QLatin1String(" "));
-	out.replace(QLatin1String("&amp;"), QLatin1String("&"));
-	out.replace(QChar(QChar::Nbsp), QLatin1String(" "));
-	out = out.trimmed();
-	return out;
 }
 
 void DbusPopupHandler::onApplicationQuit()

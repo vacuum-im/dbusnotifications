@@ -53,7 +53,6 @@ public:
 	virtual bool showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification);
 
 protected:
-	QString filter(const QString &text);
 	void closeNotification(const unsigned int notifyId);
 
 protected slots:
