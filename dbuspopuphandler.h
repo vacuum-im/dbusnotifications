@@ -1,4 +1,4 @@
-//   Plugin popup notifications for vacuum-im (c) Crying Angel, 2010
+//   Plugin popup notifications for vacuum-im (c) Crying Angel, 2015
 //   This plugin uses DBus to show notifications.
 
 //   This library is free software; you can redistribute it and/or
@@ -31,11 +31,11 @@ class DbusPopupHandler :
 		public QObject,
 		public IPlugin,
 		public INotificationHandler,
-		public IOptionsHolder,
+		public IOptionsDialogHolder,
 		public IDBusNotifications
 {
 	Q_OBJECT
-	Q_INTERFACES(IPlugin INotificationHandler IOptionsHolder IDBusNotifications)
+	Q_INTERFACES(IPlugin INotificationHandler IOptionsDialogHolder IDBusNotifications)
 public:
 	DbusPopupHandler();
 	~DbusPopupHandler();
@@ -48,7 +48,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//INotificationHandler
 	virtual bool showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification);
 

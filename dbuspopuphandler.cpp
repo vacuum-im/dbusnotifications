@@ -28,7 +28,7 @@ void DbusPopupHandler::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Dbus Popup Notifications Handler");
 	APluginInfo->description = tr("Allows other modules use DBus to show notifications");
-	APluginInfo->version = "1.2";
+	APluginInfo->version = "1.2.2";
 	APluginInfo->author = "Crying Angel";
 	APluginInfo->homePage = "http://code.google.com/p/vacuum-plugins/";
 	APluginInfo->dependences.append(NOTIFICATIONS_UUID);
@@ -124,7 +124,7 @@ bool DbusPopupHandler::initSettings()
 	{
 		IOptionsDialogNode dnode = { ONO_DBUSPOPUP, OPN_DBUSPOPUP, tr("DBus Popup"), MNI_DBUSPOPUP };
 		FOptionsManager->insertOptionsDialogNode(dnode);
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
@@ -142,13 +142,13 @@ void DbusPopupHandler::onOptionsChanged(const OptionsNode &ANode)
 	}
 }
 
-QMultiMap<int, IOptionsWidget *> DbusPopupHandler::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> DbusPopupHandler::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId==OPN_DBUSPOPUP)
 	{
-		widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->optionsHeaderWidget(tr("Notifications show provider: %1").arg(FServerInfo->prety_name),AParent));
-		widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->optionsNodeWidget(Options::node(OPV_DP_ALLOW_ACTIONS), tr("Allow actions in notifications"), AParent));
+		widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->newOptionsDialogHeader(tr("Notifications show provider: %1").arg(FServerInfo->prety_name),AParent));
+		widgets.insertMulti(OWO_DBUSPOPUP, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_DP_ALLOW_ACTIONS), tr("Allow actions in notifications"), AParent));
 	}
 	return widgets;
 }
