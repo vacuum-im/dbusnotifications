@@ -122,7 +122,7 @@ bool DbusPopupHandler::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_DBUSPOPUP, OPN_DBUSPOPUP, tr("DBus Popup"), MNI_DBUSPOPUP };
+		IOptionsDialogNode dnode = { ONO_DBUSPOPUP, OPN_DBUSPOPUP, MNI_DBUSPOPUP, tr("DBus Popup") };
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
