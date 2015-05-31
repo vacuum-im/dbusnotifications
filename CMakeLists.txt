@@ -22,16 +22,3 @@ include("${CMAKE_SOURCE_DIR}/cmake/plugin.cmake")
 
 install(DIRECTORY "resources/menuicons" DESTINATION "${INSTALL_RESOURCES}")
 
-#Release must be quiet, without debug output
-
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
-    "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
-  message(STATUS "No build type selected, default is Debug")
-endif(NOT CMAKE_BUILD_TYPE)
-
-string(TOUPPER ${CMAKE_BUILD_TYPE} IS_CONFIG_RELEASE)
-
-if(NOT IS_CONFIG_RELEASE STREQUAL "DEBUG")
-  add_definitions(-DQT_NO_DEBUG_OUTPUT -DQT_NO_WARNING_OUTPUT)
-endif()

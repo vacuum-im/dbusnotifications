@@ -19,17 +19,5 @@
         <source>Ignore</source>
         <translation>Ignore</translation>
     </message>
-    <message>
-        <source>DBus Popup</source>
-        <translation>DBus Popup</translation>
-    </message>
-    <message>
-        <source>Notifications show provider: %1</source>
-        <translation>Notifications show provider: %1</translation>
-    </message>
-    <message>
-        <source>Allow actions in notifications</source>
-        <translation>Allow actions in notifications</translation>
-    </message>
 </context>
 </TS>

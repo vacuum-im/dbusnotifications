@@ -19,17 +19,5 @@
         <source>Allows other modules use DBus to show notifications</source>
         <translation>Позволяет использовать DBus для вывода уведомлений</translation>
     </message>
-    <message>
-        <source>DBus Popup</source>
-        <translation>DBus уведомления</translation>
-    </message>
-    <message>
-        <source>Notifications show provider: %1</source>
-        <translation>Система отображения уведомлений: %1</translation>
-    </message>
-    <message>
-        <source>Allow actions in notifications</source>
-        <translation>Предоставлять дополнительные действия в уведомлениях</translation>
-    </message>
 </context>
 </TS>

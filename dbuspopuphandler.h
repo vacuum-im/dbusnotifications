@@ -23,19 +23,17 @@
 
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/inotifications.h>
-#include <interfaces/ioptionsmanager.h>
 #include <interfaces/iavatars.h>
-#include "idbusnotifications.h"
+
+#define DBUSPOPUPHANDLER_UUID "{63685fbc-5a2d-4e8c-b9d5-d69ea8fbdb4e}"
 
 class DbusPopupHandler :
 		public QObject,
 		public IPlugin,
-		public INotificationHandler,
-		public IOptionsDialogHolder,
-		public IDBusNotifications
+		public INotificationHandler
 {
 	Q_OBJECT
-	Q_INTERFACES(IPlugin INotificationHandler IOptionsDialogHolder IDBusNotifications)
+	Q_INTERFACES(IPlugin INotificationHandler)
 public:
 	DbusPopupHandler();
 	~DbusPopupHandler();
@@ -45,32 +43,22 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
-	virtual bool initSettings();
+	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
-	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//INotificationHandler
 	virtual bool showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification);
 
-protected:
-	void closeNotification(const unsigned int notifyId);
-
 protected slots:
-	void onOptionsOpened();
-	void onOptionsChanged(const OptionsNode &ANode);
-	void onActionInvoked(unsigned int notifyId, QString action);
+	void onActionInvoked(uint id, QString action);
+	void onNotificationClosed(uint dbusNotifyId, uint reason);
 	void onApplicationQuit();
 
 private:
 	IAvatars *FAvatars;
 	INotifications *FNotifications;
-	IOptionsManager *FOptionsManager;
 	QDBusInterface *FNotifyInterface;
 
-	ServerInfo *FServerInfo;
-
-	QMap <int, int> FNotifies;
-	bool FAllowActions;
+	QMap <uint, int> FNotifies; /* dbus reply notification id, vacuum-im internal notification id */
 };
 
 #endif // DBUSPOPUPHANDLER_H
