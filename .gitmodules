@@ -1,0 +1,4 @@
+[submodule "cmake"]
+	path = cmake
+	url = git://github.com/Vacuum-IM/buildsys-cmake.git
+	branch = 1.2.x
