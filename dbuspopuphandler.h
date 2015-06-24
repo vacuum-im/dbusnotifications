@@ -27,6 +27,15 @@
 
 #define DBUSPOPUPHANDLER_UUID "{63685fbc-5a2d-4e8c-b9d5-d69ea8fbdb4e}"
 
+struct ServerInfo
+{
+	QString name;
+	QString vendor;
+	QString version;
+	QString spec_version;
+	QStringList capabilities;
+};
+
 class DbusPopupHandler :
 		public QObject,
 		public IPlugin,
@@ -58,7 +67,10 @@ private:
 	INotifications *FNotifications;
 	QDBusInterface *FNotifyInterface;
 
+	ServerInfo *FServerInfo;
+
 	QMap <uint, int> FNotifies; /* dbus reply notification id, vacuum-im internal notification id */
+	bool FAllowActions;
 };
 
 #endif // DBUSPOPUPHANDLER_H
