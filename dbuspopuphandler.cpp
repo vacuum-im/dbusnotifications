@@ -169,5 +169,3 @@ void DbusPopupHandler::onApplicationQuit()
 {
 	FNotifications->removeNotificationHandler(NHO_DBUSPOPUP, this);
 }
-
-Q_EXPORT_PLUGIN2(plg_notifications, DbusPopupHandler)

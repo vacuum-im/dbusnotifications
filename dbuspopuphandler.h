@@ -45,6 +45,7 @@ class DbusPopupHandler :
 {
 	Q_OBJECT
 	Q_INTERFACES(IPlugin INotificationHandler)
+	Q_PLUGIN_METADATA(IID "DbusPopupHandler")
 public:
 	DbusPopupHandler();
 	~DbusPopupHandler();
