@@ -13,10 +13,9 @@ DbusPopupHandler::DbusPopupHandler()
 	FNotifyInterface = NULL;
 
 #ifdef DEBUG_RESOURCES_DIR
-		FileStorage::setResourcesDirs(FileStorage::resourcesDirs() << DEBUG_RESOURCES_DIR);
+	FileStorage::setResourcesDirs(FileStorage::resourcesDirs() << DEBUG_RESOURCES_DIR);
 #endif
 }
-
 
 DbusPopupHandler::~DbusPopupHandler()
 {
@@ -35,7 +34,6 @@ void DbusPopupHandler::pluginInfo(IPluginInfo *APluginInfo)
 
 bool DbusPopupHandler::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-
 	IPlugin *plugin = APluginManager->pluginInterface("IAvatars").value(0, NULL);
 	if(plugin)
 		FAvatars = qobject_cast<IAvatars *>(plugin->instance());
@@ -57,17 +55,16 @@ bool DbusPopupHandler::initObjects()
 										  QDBusConnection::sessionBus(), this);
 	if(FNotifyInterface->lastError().type() != QDBusError::NoError)
 	{
-		LOG_WARNING(QString("Unable to create QDBusInterface."));
+		LOG_WARNING(QString("Unable to create QDBusInterface: %1.").arg(FNotifyInterface->lastError().message()));
 		return false;
 	}
 	else
-		LOG_INFO(QString("QDBusInterface created successfully."));
-
+		LOG_INFO(QLatin1String("QDBusInterface created successfully."));
 
 	FServerInfo = new ServerInfo;
 
 	QDBusMessage replyCaps = FNotifyInterface->call(QDBus::Block, "GetCapabilities");
-	if (QDBusMessage::ErrorMessage != replyCaps.type())
+	if (replyCaps.type() != QDBusMessage::ErrorMessage)
 	{
 		for (int i=0; i<replyCaps.arguments().at(0).toStringList().count(); i++)
 			LOG_INFO(QString("Capabilities: %1").arg(replyCaps.arguments().at(0).toStringList().at(i)));
@@ -77,11 +74,12 @@ bool DbusPopupHandler::initObjects()
 	else
 		LOG_WARNING(QString("Capabilities: DBus Error: %1").arg(replyCaps.errorMessage()));
 
-	QDBusMessage replyInfo = FNotifyInterface->call(QDBus::Block,"GetServerInformation");
-	if (QDBusMessage::ErrorMessage != replyInfo.type())
+	QDBusMessage replyInfo = FNotifyInterface->call(QDBus::Block, "GetServerInformation");
+	if (replyInfo.type() != QDBusMessage::ErrorMessage)
 	{
 		for (int i=0; i<replyInfo.arguments().count(); i++)
 			LOG_INFO(QString("Server Information: %1").arg(replyInfo.arguments().at(i).toString()));
+
 		FServerInfo->name = replyInfo.arguments().at(0).toString();
 		FServerInfo->vendor = replyInfo.arguments().at(1).toString();
 		FServerInfo->version = replyInfo.arguments().at(2).toString();
@@ -95,10 +93,10 @@ bool DbusPopupHandler::initObjects()
 	{
 		connect(FNotifyInterface,SIGNAL(ActionInvoked(uint,QString)),this,SLOT(onActionInvoked(uint,QString)));
 		connect(FNotifyInterface,SIGNAL(NotificationClosed(uint,uint)),this,SLOT(onNotificationClosed(uint,uint)));
-		LOG_INFO(QString("Actions supported."));
+		LOG_INFO(QLatin1String("Actions supported."));
 	}
 	else
-		LOG_INFO(QString("Actions not supported."));
+		LOG_INFO(QLatin1String("Actions not supported."));
 
 	FNotifications->insertNotificationHandler(NHO_DBUSPOPUP, this);
 
@@ -107,6 +105,8 @@ bool DbusPopupHandler::initObjects()
 
 bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification)
 {
+	if (!FNotifyInterface)
+		return false;
 	if (AOrder != NHO_DBUSPOPUP || !(AKind & INotification::PopupWindow))
 		return false;
 
@@ -118,32 +118,33 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 		imgPath = FAvatars->avatarFileName(FAvatars->avatarHash(contactJid));
 
 	QList<QVariant> notifyArgs;
-	notifyArgs.append("Vacuum-IM");
-	notifyArgs.append((uint)0);
+	notifyArgs.append(QLatin1String("Vacuum-IM"));
+	notifyArgs.append(static_cast<uint>(0));
 	notifyArgs.append(iconPath);
 	notifyArgs.append(ANotification.data.value(NDR_TOOLTIP).toString());
 
 	QString popupBody = ANotification.data.value(NDR_POPUP_TEXT).toString();
-	notifyArgs.append(popupBody);
+	notifyArgs.append(popupBody.toHtmlEscaped());
 
 	QStringList actions;
 	if (FAllowActions)
 	{
-		actions << "action_show" << tr("Show");
-		actions << "action_ignore" << tr("Ignore");
+		actions << QLatin1String("action_show") << tr("Show");
+		actions << QLatin1String("action_ignore") << tr("Ignore");
 	}
 	notifyArgs.append(actions);
 
 	QVariantMap hints;
 	if (!imgPath.isEmpty())
 	{
-		hints.insert("image_path", imgPath);
-		hints.insert("suppress-sound", true);
+		hints.insert(QLatin1String("image_path"), imgPath);
+		hints.insert(QLatin1String("suppress-sound"), true);
 	}
+	hints.insert(QLatin1String("category"), QLatin1String("im"));
 	notifyArgs.append(hints);
 	notifyArgs.append(Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt()*1000);
 
-	QDBusReply<uint> reply = FNotifyInterface->callWithArgumentList(QDBus::Block, "Notify", notifyArgs);
+	QDBusReply<uint> reply = FNotifyInterface->callWithArgumentList(QDBus::Block, QLatin1String("Notify"), notifyArgs);
 	FNotifies.insert(reply.value(), ANotifyId);
 
 	return true;
@@ -151,12 +152,12 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 
 void DbusPopupHandler::onActionInvoked(uint dbusNotifyId, QString action)
 {
-	if (action == "action_show")
+	if (action == QLatin1String("action_show"))
 		FNotifications->activateNotification(FNotifies.value(dbusNotifyId));
 	else
 		FNotifications->removeNotification(FNotifies.value(dbusNotifyId));
 
-	FNotifyInterface->call("CloseNotification", dbusNotifyId);
+	FNotifyInterface->call(QLatin1String("CloseNotification"), dbusNotifyId);
 }
 
 void DbusPopupHandler::onNotificationClosed(uint dbusNotifyId, uint reason)

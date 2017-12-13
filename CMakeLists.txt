@@ -24,8 +24,6 @@ find_package(Qt5DBus REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 qt5_use_modules(${PLUGIN_NAME} Xml DBus Widgets)
 
-install(DIRECTORY "resources/menuicons" DESTINATION "${INSTALL_RESOURCES}")
-
 #Release must be quiet, without debug output
 
 if(NOT CMAKE_BUILD_TYPE)
