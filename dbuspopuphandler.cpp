@@ -1,4 +1,5 @@
 #include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypes.h>
 #include <definitions/optionvalues.h>
 #include <utils/options.h>
 
@@ -26,7 +27,7 @@ void DbusPopupHandler::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Dbus Popup Notifications Handler");
 	APluginInfo->description = tr("Allows other modules use DBus to show notifications");
-	APluginInfo->version = "1.5.0";
+	APluginInfo->version = "1.5.1";
 	APluginInfo->author = "Crying Angel";
 	APluginInfo->homePage = "https://github.com/Vacuum-IM/dbusnotifications";
 	APluginInfo->dependences.append(NOTIFICATIONS_UUID);
@@ -127,7 +128,7 @@ bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId,
 	notifyArgs.append(popupBody.toHtmlEscaped());
 
 	QStringList actions;
-	if (FAllowActions)
+	if (FAllowActions && NNT_CONNECTION_ERROR != ANotification.typeId)
 	{
 		actions << QLatin1String("action_show") << tr("Show");
 		actions << QLatin1String("action_ignore") << tr("Ignore");
