@@ -74,6 +74,12 @@ private:
 
 	QMap <uint, int> FNotifies; /* dbus reply notification id, vacuum-im internal notification id */
 	bool FAllowActions;
+
+private:
+	bool initNotifyInterface();
+
+private slots:
+	void onNameOwnerChanged(QString AName, QString /*empty*/, QString /*ANewOwner*/);
 };
 
 #endif // DBUSPOPUPHANDLER_H

@@ -16,10 +16,23 @@ DbusPopupHandler::DbusPopupHandler()
 #ifdef DEBUG_RESOURCES_DIR
 	FileStorage::setResourcesDirs(FileStorage::resourcesDirs() << DEBUG_RESOURCES_DIR);
 #endif
+
+	QDBusConnection::sessionBus().connect("org.freedesktop.DBus",
+										  "/org/freedesktop/DBus",
+										  "org.freedesktop.DBus",
+										  "NameOwnerChanged",
+										  this,
+										  SLOT(onNameOwnerChanged(QString, QString, QString)));
 }
 
 DbusPopupHandler::~DbusPopupHandler()
 {
+	QDBusConnection::sessionBus().disconnect("org.freedesktop.DBus",
+											 "/org/freedesktop/DBus",
+											 "org.freedesktop.DBus",
+											 "NameOwnerChanged",
+											 this,
+											 SLOT(onNameOwnerChanged(QString, QString, QString)));
 	delete FNotifyInterface;
 }
 
@@ -27,7 +40,7 @@ void DbusPopupHandler::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Dbus Popup Notifications Handler");
 	APluginInfo->description = tr("Allows other modules use DBus to show notifications");
-	APluginInfo->version = "1.5.1";
+	APluginInfo->version = "1.5.2";
 	APluginInfo->author = "Crying Angel";
 	APluginInfo->homePage = "https://github.com/Vacuum-IM/dbusnotifications";
 	APluginInfo->dependences.append(NOTIFICATIONS_UUID);
@@ -50,17 +63,8 @@ bool DbusPopupHandler::initConnections(IPluginManager *APluginManager, int &/*AI
 
 bool DbusPopupHandler::initObjects()
 {
-	FNotifyInterface = new QDBusInterface("org.freedesktop.Notifications",
-										  "/org/freedesktop/Notifications",
-										  "org.freedesktop.Notifications",
-										  QDBusConnection::sessionBus(), this);
-	if(FNotifyInterface->lastError().type() != QDBusError::NoError)
-	{
-		LOG_WARNING(QString("Unable to create QDBusInterface: %1.").arg(FNotifyInterface->lastError().message()));
+	if (!initNotifyInterface())
 		return false;
-	}
-	else
-		LOG_INFO(QLatin1String("QDBusInterface created successfully."));
 
 	FServerInfo = new ServerInfo;
 
@@ -102,6 +106,24 @@ bool DbusPopupHandler::initObjects()
 	FNotifications->insertNotificationHandler(NHO_DBUSPOPUP, this);
 
 	return true;
+}
+
+bool DbusPopupHandler::initNotifyInterface() {
+	FNotifyInterface = new QDBusInterface("org.freedesktop.Notifications",
+										  "/org/freedesktop/Notifications",
+										  "org.freedesktop.Notifications",
+										  QDBusConnection::sessionBus(),
+										  this);
+	if(FNotifyInterface->lastError().type() != QDBusError::NoError)
+	{
+		LOG_WARNING(QString("Unable to create QDBusInterface: %1.").arg(FNotifyInterface->lastError().message()));
+		return false;
+	}
+	else
+	{
+		LOG_INFO(QLatin1String("QDBusInterface created successfully."));
+		return true;
+	}
 }
 
 bool DbusPopupHandler::showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification)
@@ -170,4 +192,12 @@ void DbusPopupHandler::onNotificationClosed(uint dbusNotifyId, uint reason)
 void DbusPopupHandler::onApplicationQuit()
 {
 	FNotifications->removeNotificationHandler(NHO_DBUSPOPUP, this);
+}
+
+void DbusPopupHandler::onNameOwnerChanged(QString AName, QString /*empty*/, QString /*ANewOwner*/) {
+	if (AName != QLatin1Literal("org.freedesktop.Notifications")) {
+		return;
+	}
+
+	initNotifyInterface();
 }
