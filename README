@@ -9,10 +9,10 @@ INFORMATION
     Sergey A Potapov - <potapov.s.a@gmail.com>
 
   Web Site:
-    http://code.google.com/p/vacuum-plugins/
+    https://github.com/Vacuum-IM/dbusnotifications
 
   Source:
-    http://code.google.com/p/vacuum-im
+    https://github.com/Vacuum-IM/dbusnotifications
 
   Jabber conference:
     vacuum@conference.jabber.ru
@@ -30,14 +30,28 @@ BUILD AND INSTALL
 
   Unix example
   ------------
-  qmake VACUUM_SDK_PATH="/usr/include/vacuum" CONFIG-=debug CONFIG-=debug_and_install
+  qmake VACUUM_SDK_PATH="/usr/include/vacuum-im" CONFIG-=debug CONFIG-=debug_and_install
   make
   sudo make install
 
+  or
+
+  mkdir build
+  pushd build
+  cmake .. -DVACUUM_SDK_PATH="/usr/include/vacuum-im" -DVACUUM_LIB_PATH="/usr/lib64" -DCMAKE_BUILD_TYPE=RelWithDebInfo
+  popd
+  make
 
 CHANGELOG
 =========
   LEGEND: [+]-New feature [*]-Enhancement [-]-Bug fix
+
+  v1.5.3
+  ------
+  [-] fix memory leak
+  [+] listen Notification service restarted
+  [*] don't show actions in popup for error notifications
+  [*] port to Qt5
 
   v1.2.0
   ------
