@@ -40,7 +40,7 @@ void DbusPopupHandler::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Dbus Popup Notifications Handler");
 	APluginInfo->description = tr("Allows other modules use DBus to show notifications");
-	APluginInfo->version = "1.5.3";
+	APluginInfo->version = "1.5.4";
 	APluginInfo->author = "Crying Angel";
 	APluginInfo->homePage = "https://github.com/Vacuum-IM/dbusnotifications";
 	APluginInfo->dependences.append(NOTIFICATIONS_UUID);
