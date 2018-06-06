@@ -22,10 +22,10 @@ include("${CMAKE_SOURCE_DIR}/cmake/plugin.cmake")
 find_package(Qt5Xml REQUIRED)
 find_package(Qt5DBus REQUIRED)
 find_package(Qt5Widgets REQUIRED)
-qt5_use_modules(${PLUGIN_NAME} Xml DBus Widgets)
+
+target_link_libraries(${PLUGIN_NAME} Qt5::Xml Qt5::DBus Qt5::Widgets)
 
 #Release must be quiet, without debug output
-
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
